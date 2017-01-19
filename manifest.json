@@ -1,0 +1,47 @@
+{
+	"name": "FB Calendar",
+	"version": "1.1",
+	"manifest_version": 2,
+	"description": "Extension to add select Facebook events to your Google Calendar with the click of a button!",
+	"homepage_url": "http://github.com/anyazz",
+	"icons": {
+		"16": "icons/icon-16.png",
+		"48": "icons/icon-48.png",
+		"128": "icons/icon-128.png"
+	},
+	"default_locale": "en",
+	"page_action": {
+		"default_icon": "icons/icon-48.png",
+		"default_title": "FB Calendar",
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"scripts": ["js/moment.js", "js/moment-timezone-data.js", "js/jquery-3.1.1.js", "js/background.js", "js/gapi-client.js"],
+		"persistent": false
+	},
+	"content_scripts": [
+		{
+			"matches": ["*://www.facebook.com/events/*"],
+			"js": ["js/moment.js", "js/moment-timezone-data.js", "js/jquery-3.1.1.js", "js/extension.js"]
+    }],
+	"content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
+	"oauth2": {
+		"client_id": "959780096527-nk761kkom2cv7mvnodi9b2l018o43p9n.apps.googleusercontent.com",
+		"scopes": [
+		  "https://www.googleapis.com/auth/calendar", "profile"
+		]
+	},
+
+	"permissions": [
+    "*://facebook.com/*",
+    "*://calendar.google.com/*",
+    "tabs",
+	"webNavigation",
+	"identity",
+	"https://*.googleapis.com/*",
+    "https://*.googleusercontent.com/*"
+
+
+	]
+
+}

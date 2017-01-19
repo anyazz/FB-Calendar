@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+
+<head>
+	<script type="text/javascript" src="js/email-js.js"></script>
+	<script type="text/javascript" src="js/jquery-3.1.1.js"></script>
+	<script type="text/javascript" src="js/moment.js"></script>
+	<script type="text/javascript" src="js/moment-timezone-data.js"></script>
+</head>
+
+<body id="popup-body" class="popup">
+	<div id="loading-div">
+		<div class="loader"></div>
+		<br>
+		<div id="loading-text">Loading...</div>
+	</div>
+	<div id="event-info">
+		<div id="title"></div>
+		<table id="event-body">
+			<tr>
+				<td>
+					<img class="event-icons" src="icons/clock.png" height="25px">
+				</td>
+				<td>
+					<div id="start-time"></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img class="event-icons" src="icons/map.png" height="25px"></td>
+				<td>
+					<div id="location"></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<img class="event-icons" src="icons/speech.png" height="25px"></td>
+				<td>
+					<div id="description"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+
+	<a id="buttons">
+		<img src="icons/button.png" height="25px" id="add-btn" class="add-btn">
+		<img src="icons/button-click.png" height="25px" id="add-btn-hover" class="add-btn">
+	</a>
+	<br>
+	<br>
+
+	<span id="output" style="color: #16a706"></span>
+
+	<div id="authorize-div" style="display: none">
+		<span>Authorize access to Google Calendar API</span>
+		<!--Button for the user to click to initiate auth sequence -->
+		<button id="authorize-button">
+			Authorize
+		</button>
+	</div>
+
+	<div class="error-div" id="load-error">
+		<span style="color: #df2d2d">Error loading event details.</span>
+		<span>If this is an event page, please refresh the page and try again. If this error continues to appear, click below to automatically send a bug report!</span>
+		<br>
+		<!--Button for the user to click to report bug -->
+		<button class="bug-button" id="load-report">
+			Report Bug :(
+		</button>
+	</div>
+	<div class="error-div" id="display-error">
+		<span style="color: #df2d2d">Error displaying event details.</span>
+		<span>Please close the popup window and try again. If this error continues to appear, click below to automatically send a bug report!</span>
+		<br>
+		<!--Button for the user to click to report bug -->
+		<button class="bug-button" id="display-report">
+			Report Bug :(
+		</button>
+	</div>
+
+
+	<script src="https://apis.google.com/js/client.js"></script>
+	<script src="https://apis.google.com/js/api.js"></script>
+	<script src="js/popup.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="popup.css">
+
+</body>
