@@ -85,26 +85,56 @@ function extension() {
 			// uses MIT's indispensable Moment.js (momentjs.com) 
 
 			// get Facebook-defined startDate for event 
-			var DT = $("[class='_publicProdFeedInfo__timeRowTitle _5xhk']").attr('content');
-			var startDT = ""
+			var startDT = $("[itemprop='startDate']").attr('content');
 			var endDT = ""
 
 			// use RegEx to define temporary start and end
-			var start = DT.match("(.*) to")
-			if (start !== null) {
-				startDT = start[1]
-				endDT = DT.match("to (.*)")[1]
+			var start = textWithBreaks.match("at \n(.*)\n");
+			var end = textWithBreaks.match("- \n(.*)\n");
+			if (end === null) {
+				// replace normal dash w/ em-dash
+				end = textWithBreaks.match("– \n(.*)\n");
 			}
 
-			// if end doesn't exist, automatically make event one hour long
+			// if start exists, first line is of form "Date at time (- time)"
+			if (start !== null) {
+				start = moment(start[1], 'h A')
+
+				// if end exists, event has end time
+				if (end !== null) {
+					end = moment(end[1], 'h A')
+
+					// calculate difference bet. start and end
+					var diff = moment.duration(end.diff(start));
+
+					// if event goes overnight, diff may be negative (ex. 10 PM to 2 AM) - subtract from 24 hrs
+					if (diff._milliseconds < 0) {
+						diff._milliseconds = 86400000 + diff._milliseconds;
+					}
+
+					// add difference to startDT for endDT
+					var sum = moment(startDT, moment.ISO_8601).add(diff)
+					endDT = sum.format()
+				}
+
+				// else, automatically make event one hour long
+				else {
+					var sum = moment(startDT, moment.ISO_8601).add(1, 'hours')
+					endDT = sum.format()
+				}
+			}
+			// else if start doesn't exist (first line of form "Date - Date")
 			else {
-				startDT = DT
-				var sum = moment(startDT, moment.ISO_8601).add(1, 'hours')
+				// time information then located in second line; similar process
+				var line2 = textWithBreaks.match(end[1] + "\n(.*)\n")
+				start = line2[1].match("(.*) to")[1]
+				end = line2[1].match("to (.*)M")[1]
+				end = moment(end, 'MMM D at h:MM A')
+				start = moment(start, 'MMM D at h:MM A')
+				var diff = moment.duration(end.diff(start));
+				var sum = moment(startDT, moment.ISO_8601).add(diff)
 				endDT = sum.format()
 			}
-			console.log(DT);
-			console.log(startDT);
-			console.log(endDT);
 
 			// GET DESCRIPTION
 			// use id if available; else by classes

@@ -1,4 +1,12 @@
-CLIENT ID (published): 959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com
+CLIENT ID (published): 
+959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com
+
+ClientID(dev2): 
+959780096527-nk761kkom2cv7mvnodi9b2l018o43p9n.apps.googleusercontent.com
+
+
+
+
 
 Item ID (published): ddnpcknbcdbgogfikadfcioemdbfokla
 
@@ -22,7 +30,7 @@ Client secret (test.html): HrJzoMou3lJkRgqgb5RMQ0yu
 
 
 ID (dev2): mkbijdddkdhljccpdekgchmjimpffnhe
-ClientID(dev2): 959780096527-nk761kkom2cv7mvnodi9b2l018o43p9n.apps.googleusercontent.com
+
 
 Google Cal API: https://developers.google.com/google-apps/calendar/quickstart/js
 https://developers.google.com/google-apps/calendar/v3/reference/events/insert

@@ -1,9 +1,4 @@
-// Dev Client ID
-// var CLIENT_ID = '959780096527-nk761kkom2cv7mvnodi9b2l018o43p9n.apps.googleusercontent.com';
-
-// Published Client ID
 var CLIENT_ID = '959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com';
-
 var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;
 

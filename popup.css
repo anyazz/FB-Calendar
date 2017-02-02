@@ -1,13 +1,12 @@
 .popup {
-	width:250px; 
-	height:150px; 
+	width:260px; 
+	height:170px; 
 	background-color: #d3dbed;
 	margin-left: 20px;
 	margin-right: 20px;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
-  hyphens: auto;
-
+    hyphens: auto;
 }
 
 #add-btn {
@@ -60,7 +59,7 @@
 
 .bug-button {
 	position: relative;
-	top: 20px;
+	top: 10px;
 }
 
 #buttons {
@@ -73,7 +72,9 @@
 
 .error-div {
 	display:none;
-	text-align: center
+	text-align: center;
+	margin-top: -20px;
+	font: 8pt;
 }
 
 .loader {
@@ -95,7 +96,7 @@
 
 #loading-div {
 	text-align:center;
-	margin-top: 70px;
+	margin-top: 90px;
 }
 
 #loading-text {

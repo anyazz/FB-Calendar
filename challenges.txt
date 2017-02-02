@@ -1,0 +1,42 @@
+authorizing app to read/write user data - 
+1. issues with client id/scope
+2. origin mismatch:
+	Request Details:
+	client_id=959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com
+	scope=https://www.googleapis.com/auth/calendar
+	immediate=false
+	include_granted_scopes=true
+	proxy=oauth2relay809841720
+	redirect_uri=postmessage
+	origin=chrome-extension://gjojpojlchlgfkbllgajakkaioeodfem
+	response_type=token
+	gsiwebsdk=1
+	state=2041870845|0.546603231
+	jsh=m;/_/scs/apps-static/_/js/k=oz.gapi.en.oKHdHV2xpm0.O/m=__features__/am=AQ/rt=j/d=1/rs=AGLTcCNd8FlX7D-ugulSNNOrsQOkuRZJKA
+3. execute undefined - rearrange variable/function order, diff bet var = function and function
+4. gapi.client....insert doesn't work
+	- have to use execute. syntax
+	- gapi.client.load('calendar', 'v3', wrapperCallbackFunction); !!!!!
+5. messaging between popup and DOM
+6. scraping FB HTML
+	- get event_summary:{container_id:
+	- convert to text w/ line breaks:
+	function collectTextNodes(element, texts) {
+		for (var child= element.firstChild; child!==null; child= child.nextSibling) {
+			if (child.nodeType===3)
+				texts.push(child);
+			else if (child.nodeType===1)
+				collectTextNodes(child, texts);
+		}
+	}
+
+	function getTextWithSpaces(element) {
+		var texts= [];
+		collectTextNodes(element, texts);
+		for (var i= texts.length; i-->0;)
+			texts[i]= texts[i].data;
+		return texts.join('\n');
+	}
+	- LOCATION: between "Hide Map", "Report"
+	- startDate:  
+	
