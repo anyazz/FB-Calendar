@@ -1,40 +1,43 @@
 .popup {
-	width:260px; 
-	height:170px; 
-	background-color: #d3dbed;
-	margin-left: 20px;
-	margin-right: 20px;
-	overflow-wrap: break-word;
-	word-wrap: break-word;
+    width:260px;
+    height:170px;
+    background-color: #d3dbed;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
     hyphens: auto;
 }
 
 #add-btn {
-	margin-left: auto;
-	margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 #title {
-	font: Lucida Grande;
-	font-size: 13pt;
-	font-weight: bold;
-	color: royalblue;
-	text-align: center;
-	margin-top: 20px
+    font: Lucida Grande;
+    font-size: 13pt;
+    font-weight: bold;
+    color: royalblue;
+    text-align: center;
+    margin-top: 20px
 }
 
 #event-body {
-	text-align:left;
-	color: #4c4c4c;
-	border-collapse:separate; 
-	border-spacing:1em;
-	margin-right: inherit;
+    text-align:left;
+    color: #4c4c4c;
+    border-collapse:separate;
+    border-spacing:1em;
+    margin-right: inherit;
 }
 
 #popup-body {
 }
 
-#output {
-	text-align:center;
+#bug-sent {
+    text-align:center;
+    position:relative;
+    top: -15px;
+    display:none;
 }
 
 #add-btn-hover, #buttons:hover #add-btn{
@@ -42,39 +45,39 @@
 }
 
 #add-btn-hover {
-	margin-left: auto;
-	margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 #add-btn, #buttons:hover #add-btn-hover{
    display:block
 }
 
 #add-btn-click {
-	dis
+    dis
 }
 
 .event-icons {
-	float:left
+    float:left
 }
 
 .bug-button {
-	position: relative;
-	top: 10px;
+    position: relative;
+    top: 10px;
 }
 
 #buttons {
-	display:none;
+    display:none;
 }
 
 #event-info {
-	display: none;
+    display: none;
 }
 
 .error-div {
-	display:none;
-	text-align: center;
-	margin-top: -20px;
-	font: 8pt;
+    display:none;
+    text-align: center;
+    margin-top: -20px;
+    font: 8pt;
 }
 
 .loader {
@@ -84,9 +87,9 @@
     width: 30px;
     height: 30px;
     animation: spin 2s linear infinite;
-	display:block;
-	margin-left: auto;
-	margin-right: auto;
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @keyframes spin {
@@ -95,10 +98,19 @@
 }
 
 #loading-div {
-	text-align:center;
-	margin-top: 90px;
+    text-align:center;
+    margin-top: 90px;
 }
 
 #loading-text {
-	color: #4c4c4c;
+    color: #4c4c4c;
+}
+
+#load-error {
+
+}
+
+#calendarMenu {
+    display: none;
+    margin-bottom: 20px
 }
