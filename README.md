@@ -4,7 +4,7 @@
 
 FB Calendar is a Google Chrome Extension that activates on Facebook event pages and displays the corresponding event's information (title, start/end time in your time zone, location, and description), which can be sent to your calendar with the click of a button: 
 
-<img src='Screenshot.png' title='FB Calendar in action!' width='400px' /> &nbsp; &nbsp;&nbsp;&nbsp; <img src='Screenshot2.png' title='FB Calendar in action!' width='400px' />
+<img src='Screenshot2.png' title='FB Calendar in action!' width='400px' /> &nbsp; &nbsp;&nbsp;&nbsp; <img src='Screenshot.png' title='FB Calendar in action!' width='400px' />
 
 
 
