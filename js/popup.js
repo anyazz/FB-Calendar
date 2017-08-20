@@ -1,9 +1,8 @@
 // Dev Client ID
-var CLIENT_ID = '137926979511-6sv3v9g0lsiese2i7lbaio45p4uvujdm.apps.googleusercontent.com';
-//var CLIENT_ID = '959780096527-nk761kkom2cv7mvnodi9b2l018o43p9n.apps.googleusercontent.com';
+//var CLIENT_ID = '137926979511-6sv3v9g0lsiese2i7lbaio45p4uvujdm.apps.googleusercontent.com';
 
 // Published Client ID
-//var CLIENT_ID = '959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com';
+var CLIENT_ID = '137926979511-67r4kmcd8st7tnfatslu9r4all7r91ir.apps.googleusercontent.com';
 
 var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;

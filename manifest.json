@@ -1,6 +1,6 @@
 {
     "name": "FB Calendar",
-    "version": "1.2",
+    "version": "2.0",
     "manifest_version": 2,
     "description": "Extension to add select Facebook events to your Google Calendar with the click of a button!",
     "homepage_url": "http://github.com/anyazz",
@@ -27,7 +27,7 @@
     }],
     "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
     "oauth2": {
-        "client_id": "137926979511-6sv3v9g0lsiese2i7lbaio45p4uvujdm.apps.googleusercontent.com",
+        "client_id": "137926979511-67r4kmcd8st7tnfatslu9r4all7r91ir.apps.googleusercontent.com",
         "scopes": [
           "https://www.googleapis.com/auth/calendar", "profile"
         ]
