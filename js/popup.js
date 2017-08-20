@@ -12,16 +12,22 @@ var eventSuccess = false;
  On load, check for Google authentication
 */
 window.onload = function () {
-    //    checkLoad();
     checkAuth();
 };
 
 function isEventUrl() {
-    console.log(window.location.pathname);
-    var page = window.location.pathname.split('/')[1];
-    console.log(page);
-    var invalidPages = ["birthdays", "upcoming", "past", "calendar", "discovery"];
-    return (!invalidPages.includes(page))
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    }, function (tabs) {
+        var url = tabs[0].url;
+        console.log(url);
+        var page = url.split('/')[1];
+        console.log(page);
+        var invalidPages = ["birthdays", "upcoming", "past", "calendar", "discovery"];
+
+        return (!invalidPages.includes(page))
+    })
 }
 
 /*
@@ -97,28 +103,44 @@ var tries = 0;
 var calendarList = [];
 
 function loadEvent() {
-    var request = gapi.client.calendar.calendarList.list();
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    }, function (tabs) {
+        var url = tabs[0].url;
+        console.log(url);
+        var page = url.match("/events/(.*)")[1].split('/')[0]
+        console.log(page);
+        var invalidPages = ["birthdays", "upcoming", "past", "calendar", "discovery"];
 
-    request.execute(function (resp) {
-        var calendars = resp.items;
-        for (var i = calendars.length; i-- > 0;) {
-            if (calendars[i].accessRole == "owner" || calendars[i].accessRole == "writer") {
-                if (calendars[i].primary) {
-                    calendarList.unshift({
-                        "summary": calendars[i].summary + " (Primary)",
-                        "id": calendars[i].id
-                    })
-                } else {
-                    calendarList.push({
-                        "summary": calendars[i].summary,
-                        "id": calendars[i].id
-                    });
+        if (!invalidPages.includes(page)) {
+            var request = gapi.client.calendar.calendarList.list();
+
+            request.execute(function (resp) {
+                var calendars = resp.items;
+                for (var i = calendars.length; i-- > 0;) {
+                    if (calendars[i].accessRole == "owner" || calendars[i].accessRole == "writer") {
+                        if (calendars[i].primary) {
+                            calendarList.unshift({
+                                "summary": calendars[i].summary + " (Primary)",
+                                "id": calendars[i].id
+                            })
+                        } else {
+                            calendarList.push({
+                                "summary": calendars[i].summary,
+                                "id": calendars[i].id
+                            });
+                        }
+                    }
                 }
-            }
+                console.log("loadEvent", calendarList);
+                getEvent();
+            });
+        } else {
+            show("event-error", true);
+            show("loading-div", false);
         }
-        console.log("loadEvent", calendarList);
-        getEvent();
-    });
+    })
 }
 
 function getEvent() {
@@ -129,6 +151,7 @@ function getEvent() {
         chrome.tabs.sendMessage(tabs[0].id, {
             type: "getEvent"
         }, function (event) {
+            console.log(event);
             if (event == "loading-error") {
                 report("load-error");
             } else if (event == "loading") {
@@ -188,6 +211,7 @@ function updateInfo(resource) {
     console.log("eventSuccess", true);
     show("loading-div", false);
     show("load-error", false);
+    show("event-error", false);
     show("display-error", false);
     show("event-info", true);
     show("buttons", true);
