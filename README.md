@@ -2,9 +2,9 @@
 
 ## Introduction
 
-FB Calendar is a Google Chrome Extension that activates on Facebook event pages and displays the corresponding event's information (title, start/end time in your time zone, location, and description), which can be sent to your calendar with the click of a button: 
+FB Calendar is a Google Chrome Extension that activates on Facebook event pages and displays the corresponding event's information (title, start/end time in your time zone, location, and description), which can be sent to your calendar with the click of a button:
 
-![Alt text](/FB-Calendar/Screenshot.png?raw=true "FB Calendar in action!")
+![Alt text](Screenshot.png?raw=true "FB Calendar in action!")
 
 ## Code
 As with all Chrome extensions, FB Calendar is built with standard HTML, CSS, and JavaScript. It also makes use of the [Google Calendar API](https://developers.google.com/google-apps/calendar/), [Moment.js](momentjs.com/) and [Moment Timezone](momentjs.com/timezone/), [EmailJS](emailjs.com), and jQuery 3.1.1. The majority of the work is done by [extension.js](/FB-Calendar/extension.js), which reads the event page's DOM for pertinent information, and [popup.js](/FB-Calendar/popup.js), which then receives the information, displays it, and sends it to the Google API.
@@ -19,5 +19,5 @@ FB Calendar is available for free on the Chrome Web Store [here](https://chrome.
 
 
 ## Contributors
-It seems like nearly every Facebook event's HTML is structured differently, often in ways that require extreme workarounds. If anyone finds another missing bug/loophole they'd like to tackle, please feel free to contribute to this project! 
+It seems like nearly every Facebook event's HTML is structured differently, often in ways that require extreme workarounds. If anyone finds another missing bug/loophole they'd like to tackle, please feel free to contribute to this project!
 

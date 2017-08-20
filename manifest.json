@@ -1,6 +1,6 @@
 {
     "name": "FB Calendar",
-    "version": "2.0",
+    "version": "2.0.1",
     "manifest_version": 2,
     "description": "Extension to add select Facebook events to your Google Calendar with the click of a button!",
     "homepage_url": "http://github.com/anyazz",
