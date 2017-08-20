@@ -294,6 +294,8 @@ function report(bug_id) {
     show("loading-div", false);
     show(bug_id, true);
     var button_id = bug_id.match("(.*)error")[1] + "report";
+    var email_id = bug_id.match("(.*)error")[1] + "email-input";
+    console.log(button_id);
     // get tab information
     chrome.tabs.query({
         active: true,
@@ -302,7 +304,10 @@ function report(bug_id) {
 
         // upon button click, send automated bug report with necessary info using emailjs
         document.getElementById(button_id).addEventListener('click', function () {
-            var email = document.getElementById("email-input").value;
+            console.log("clicked");
+            show(button_id, false);
+            show(email_id, false);
+            var email = document.getElementById(email_id).value;
             var parameters = {
                 "url": tabs[0].url,
                 "time": moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
@@ -313,9 +318,7 @@ function report(bug_id) {
             emailjs.send("gmail", "fbcalendar_bug", parameters)
                 .then(function (response) {
                     console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
-                    $(button_id).hide();
-                    $(".email-input").hide();
-                    $("#bug-sent").show();
+                    show("bug-sent", true);
                 }, function (err) {
                     console.log("FAILED. error=", err);
                 });
