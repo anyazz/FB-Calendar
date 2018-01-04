@@ -8,9 +8,18 @@
     <script type="text/javascript" src="js/moment-timezone-data.js"></script>
 </head>
 
+<div id="authorize-div" style="display: none">
+    <span style="color:#404040">Click to authorize access to Google Calendar!</span>
+    <!--Button for the user to click to initiate auth sequence -->
+    <a id="auth-buttons">
+        <img src="icons/authorize.png" height="25px" id="auth-btn" class="auth-btn">
+        <img src="icons/authorize-click.png" height="25px" id="auth-btn-hover" class="auth-btn">
+    </a>
+</div>
+
 <body id="popup-body" class="popup">
     <div id="loading-div">
-        <div class="loader"></div>
+        <div class="loader" id="loading-loader"></div>
         <br>
         <div id="loading-text">Loading...</div>
     </div>
@@ -56,42 +65,33 @@
     <br>
     <br>
 
-    <div id="authorize-div" style="display: none">
-        <span>Authorize access to Google Calendar API</span>
-        <!--Button for the user to click to initiate auth sequence -->
-        <button id="authorize-button">
-            Authorize
-        </button>
+
+
+    <div class="error-div" id="error-div" style="display: none">
+        <span id="error-text" style="color: #df2d2d"></span>
+        <span id="error-description"></span>
+        <br>
+        <br>
+
+        <div id="error-form">
+            <input class="email-input" id="email-input" type="text" placeholder="Email (Optional)">
+            <div class="email-check" id="email-check">
+                <input class="email-checkbox" id="email-checkbox" type="checkbox">
+                <span> Include my email.</span>
+            </div>
+
+            <!--Button for the user to click to report bug -->
+            <button class="bug-button" id="error-report">
+                Report Bug :(
+            </button>
+        </div>
+
+
     </div>
 
-    <div class="error-div" id="load-error" style="display: none">
-        <span style="color: #df2d2d">Error loading event details.</span>
-        <span>If this is an event page, please refresh the page and try again. <br>If this error continues to appear, click below to send an automatic bug report! Optionally, enter your email if you'd like follow-up about the error.
-</span>
-        <br><br>
-
-        <form>
-            <input class="email-input" id="load-email-input" type="text" placeholder="Email (Optional)">
-        </form>
-        <!--Button for the user to click to report bug -->
-        <button class="bug-button" id="load-report">
-            Report Bug :(
-        </button>
-
+    <div id="sending-div" style="display: none">
+        <div class="loader" id="sending-loader"></div>
     </div>
-    <div class="error-div" id="display-error" style="display: none">
-        <span style="color: #df2d2d">Error displaying event details.</span>
-        <span>Please close the popup window and try again. If this error continues to appear, click below to automatically send a bug report! Optionally, enter your email if you'd like follow-up about the error. </span>
-        <br><br>
-        <form>
-            <input class="email-input" id="display-email-input" type="text" placeholder="Email (Optional)">
-        </form>
-        <!--Button for the user to click to report bug -->
-        <button class="bug-button" id="display-report">
-            Report Bug :(
-        </button>
-    </div>
-
     <div id="bug-sent"><span style="color: #16a706">Bug report sent. Thanks for your help!</span></div>
 
     <script src="https://apis.google.com/js/client.js"></script>

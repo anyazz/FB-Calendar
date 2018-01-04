@@ -1,6 +1,5 @@
-
-var CLIENT_ID = '959780096527-unuimtrulehucog1s44m8vq8v0ob1lin.apps.googleusercontent.com';
 var SCOPES = ["https://www.googleapis.com/auth/calendar"];
+var email;
 
 // show extension and load scripts on Facebook event pages
 // adapted from http://stackoverflow.com/questions/20855956/how-to-show-chrome-extension-on-certain-domains
@@ -31,7 +30,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(onWebNav, filter);
 
 // get Google authentication token
 chrome.identity.getAuthToken({
-    'interactive': true
+    'interactive': false
 }, function (token) {
     return true;
 });
@@ -50,5 +49,35 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 console.log("message received:", response)
             });
         });
+    }
+});
+
+chrome.tabs.onReplaced.addListener(function (tabId, changeInfo, tab) {
+    if (changeInfo.status == 'complete') {
+        console.log("complete")
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                type: "tabReplaced"
+            }, function (response) {
+                console.log("message received:", response)
+            });
+        });
+    }
+});
+
+// Get user email address for bug reports
+chrome.identity.getProfileUserInfo(function (info) {
+    email = info.email;
+});
+
+// On request, send user email to popup.js
+chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.type == "getEmail") {
+        sendResponse({
+            email: email
+        })
     }
 });

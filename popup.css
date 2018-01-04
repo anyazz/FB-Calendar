@@ -1,12 +1,8 @@
 .popup {
     width:260px;
-    height:170px;
     background-color: #d3dbed;
     margin-left: 20px;
     margin-right: 20px;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    hyphens: auto;
 }
 
 #add-btn {
@@ -31,6 +27,9 @@
 }
 
 #popup-body {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 #bug-sent {
@@ -52,8 +51,17 @@
    display:block
 }
 
-#add-btn-click {
-    dis
+#auth-btn-hover, #auth-buttons:hover #auth-btn{
+    display:none
+}
+
+.auth-btn {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+#auth-btn, #auth-buttons:hover #auth-btn-hover{
+    display:block
 }
 
 .event-icons {
@@ -63,6 +71,7 @@
 .bug-button {
     position: relative;
     top: 10px;
+    margin-bottom: 10px;
 }
 
 #buttons {
@@ -82,11 +91,7 @@
 }
 
 .loader {
-    border: 6px solid #f3f3f3; /* Light grey */
-    border-top: 6px solid #135099; /* Blue */
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
     animation: spin 2s linear infinite;
     display:block;
     margin-left: auto;
@@ -108,7 +113,7 @@
 }
 
 #event-error {
-    margin-top: 40px;
+    margin-top: 30px;
 }
 
 #calendarMenu {
@@ -116,4 +121,44 @@
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 20px
+}
+
+.email-check {
+    text-align: center;
+    color: #404040;
+    font-size: 8pt;
+    cursor: default;
+}
+
+.email-input {
+    color: #363636;
+    font-size: 9pt
+}
+
+#sending-loader {
+    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #135099; /* Blue */
+}
+
+#loading-loader {
+    border: 6px solid #f3f3f3; /* Light grey */
+    border-top: 6px solid #135099; /* Blue */
+    width: 30px;
+    height: 30px;
+}
+
+#error-description {
+    word-break: keep-all;
+    word-wrap: normal
+}
+
+#authorize-div {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#auth-buttons {
 }

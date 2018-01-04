@@ -1,8 +1,8 @@
 // Dev Client ID
-//var CLIENT_ID = '137926979511-6sv3v9g0lsiese2i7lbaio45p4uvujdm.apps.googleusercontent.com';
+var CLIENT_ID = '959780096527-sk8sgb89g46rff403qj80jarlofv46nr.apps.googleusercontent.com';
 
 // Published Client ID
-var CLIENT_ID = '137926979511-67r4kmcd8st7tnfatslu9r4all7r91ir.apps.googleusercontent.com';
+//var CLIENT_ID = '959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com    ';
 
 var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;
@@ -10,23 +10,28 @@ var eventSuccess = false;
 /*
  On load, check for Google authentication
 */
+
 window.onload = function () {
     checkAuth();
 };
 
-function isEventUrl() {
-    chrome.tabs.query({
-        active: true,
-        currentWindow: true
-    }, function (tabs) {
-        var url = tabs[0].url;
-        console.log(url);
-        var page = url.split('/')[1];
-        console.log(page);
-        var invalidPages = ["birthdays", "upcoming", "past", "calendar", "discovery"];
-
-        return (!invalidPages.includes(page))
-    })
+// Check if url links to an event page
+function isEventUrl(url) {
+    console.log(url);
+    return true
+        //    if (!url.includes("events")) {
+        //        return false
+        //    }
+        //    var array = url.match('/events/(.*)/');
+        //    var eventID;
+        //    if (array != null) {
+        //        eventID = array[1]
+        //    }
+        //    else {
+        //        var urlArray = url.split('/')
+        //        eventID = urlArray[urlArray.length-1];
+        //    }
+        //    return (/^\d+$/.test(eventID))
 }
 
 /*
@@ -57,12 +62,13 @@ function checkAuth() {
 function handleAuthResult(authResult) {
     if (authResult && !authResult.error) {
         // Hide auth UI, then load client library.
-        show('authorize-div', false)
+        $('#authorize-div').hide()
         loadCalendarApi();
     } else {
         // Show auth UI, allowing the user to initiate authorization by
         // clicking authorize button.
-        show('authorize-div', true);
+        $('#authorize-div').show();
+        $('#loading-div').hide();
     }
 }
 
@@ -76,7 +82,7 @@ function loadCalendarApi() {
 /*
 If automatic check fails, allow user to initiate auth flow by clicking button.
 */
-document.getElementById("authorize-button").addEventListener('click', function () {
+$("#auth-buttons").click(function () {
     handleAuthClick(event);
 });
 
@@ -96,9 +102,8 @@ function handleAuthClick(event) {
 }
 
 /**
- * Send message to extension.js to get event information from DOM
+ * Load event info into popup window
  */
-var tries = 0;
 var calendarList = [];
 
 function loadEvent() {
@@ -106,19 +111,16 @@ function loadEvent() {
         active: true,
         currentWindow: true
     }, function (tabs) {
-        var url = tabs[0].url;
-        console.log(url);
-        var page = url.match("/events/(.*)")[1].split('/')[0]
-        console.log(page);
-        var invalidPages = ["birthdays", "upcoming", "past", "calendar", "discovery"];
-
-        if (!invalidPages.includes(page)) {
+        if (isEventUrl(tabs[0].url)) {
+            console.log("valid url")
+                // load user's calendar list from Google API
             var request = gapi.client.calendar.calendarList.list();
 
             request.execute(function (resp) {
                 var calendars = resp.items;
                 for (var i = calendars.length; i-- > 0;) {
-                    if (calendars[i].accessRole == "owner" || calendars[i].accessRole == "writer") {
+                    var accessRole = calendars[i].accessRole;
+                    if (accessRole == "owner" || accessRole == "writer") {
                         if (calendars[i].primary) {
                             calendarList.unshift({
                                 "summary": calendars[i].summary + " (Primary)",
@@ -136,12 +138,14 @@ function loadEvent() {
                 getEvent();
             });
         } else {
-            show("event-error", true);
-            show("loading-div", false);
+            console.log("invalid url")
+            $("#event-error").show();
+            $("#loading-div").hide();
         }
     })
 }
 
+// Send message to extension.js to get event information from DOM
 function getEvent() {
     chrome.tabs.query({
         active: true,
@@ -152,14 +156,15 @@ function getEvent() {
         }, function (event) {
             console.log(event);
             if (event == "loading-error") {
-                report("load-error");
+                report("load");
             } else if (event == "loading") {
                 setTimeout(getEvent, 250);
             } else {
                 try {
                     updateInfo(event);
                 } catch (err) {
-                    report("display-error");
+                    console.log(err)
+                    report("display");
                 }
             }
         })
@@ -167,9 +172,8 @@ function getEvent() {
 }
 
 /*
- Update popup window event information
+ Populate popup window fields
 */
-
 function updateInfo(resource) {
 
     // format time using Moment.js
@@ -192,12 +196,12 @@ function updateInfo(resource) {
     }
 
     // update fields
-    document.getElementById('title').textContent = resource.summary;
-    document.getElementById('start-time').textContent = time;
-    document.getElementById('location').textContent = resource.location;
-    document.getElementById('description').textContent = description;
+    $('#title').text(resource.summary);
+    $('#start-time').text(time);
+    $('#location').text(resource.location);
+    $('#description').text(description);
 
-    var calendarMenu = document.getElementById('calendarMenu');
+    var calendarMenu = $('#calendarMenu')[0];
     console.log("adding to options", calendarList.length);
     for (var i = 0; i < calendarList.length; i++) {
         var option = document.createElement("option");
@@ -208,17 +212,14 @@ function updateInfo(resource) {
     // update values and popup appearance
     eventSuccess = true;
     console.log("eventSuccess", true);
-    show("loading-div", false);
-    show("load-error", false);
-    show("event-error", false);
-    show("display-error", false);
-    show("event-info", true);
-    show("buttons", true);
-    show("calendarMenu", true);
+    $("#loading-div").hide();
+    $("#event-info").show();
+    $("#buttons").show();
+    $("#calendarMenu").show();
 
 
     // Upon button click, execute addEvent function
-    document.getElementById("buttons").addEventListener('click', function () {
+    $("#buttons").click(function () {
         gapi.client.load('calendar', 'v3', addEvent(resource));
     })
 }
@@ -247,7 +248,7 @@ function addEvent(resource) {
         active: true,
         currentWindow: true
     }, function (tabs) {
-        var menu = document.getElementById("calendarMenu");
+        var menu = $("#calendarMenu")[0];
         var calendarId = calendarList[menu.selectedIndex].id;
 
         var request = gapi.client.calendar.events.insert({
@@ -260,28 +261,20 @@ function addEvent(resource) {
             if ("error" in resp) {
                 switch (resp.code) {
                 case "403":
-                    document.getElementById("add-error").textContent = "Permission denied to write to calendar."
+                    $("#add-error").text("Permission denied to write to calendar.");
                     break;
                 case "404":
-                    document.getElementById("add-error").textContent = "Adding failed."
+                    $("#add-error").text("Adding failed.");
                     break;
                 }
-                show("calendar-error", true);
+                $("#calendar-error").show();
             } else {
-                document.getElementById("add-btn").src = "icons/success.png";
-                document.getElementById("add-btn-hover").src = "icons/success.png"
+                $("#add-btn")[0].src = "icons/success.png";
+                $("#add-btn-hover")[0].src = "icons/success.png"
             }
             console.log(resp)
         })
     })
-}
-
-
-/*
- * Shortcut function for hiding/displaying divs
- */
-function show(id, value) {
-    document.getElementById(id).style.display = value ? 'block' : 'none';
 }
 
 /*
@@ -289,38 +282,85 @@ function show(id, value) {
  */
 function report(bug_id) {
     // show error divs
-    show("event-info", false);
-    show("loading-div", false);
-    show(bug_id, true);
-    var button_id = bug_id.match("(.*)error")[1] + "report";
-    var email_id = bug_id.match("(.*)error")[1] + "email-input";
-    console.log(button_id);
+    $("#event-info").hide();
+    $("#loading-div").hide();
+    $("#error-div").show();
+
+    $("#error-text").text("Error " + bug_id + "ing event details.");
+    if (bug_id == "load") {
+        $("#error-description")[0].innerText += "If this is an event page, please refresh the page and try again. "
+    }
+    if (bug_id == "display") {
+        $("#error-description")[0].innerText += "Please close the popup window and try again. "
+    }
+    $("#error-description")[0].innerText += "If this continues to appear, click below to send an automatic bug report! Optionally, include your email if you'd like follow-up about the error."
+    var button_id = "#error-report";
+    var email_id = "#email-input";
+    var checkbox_id = "#email-checkbox";
+    var check_id = "#email-check";
+    var form_id = "#error-form"
+
+    var checkbox = $(checkbox_id)[0];
+
     // get tab information
     chrome.tabs.query({
         active: true,
         currentWindow: true
     }, function (tabs) {
+        chrome.runtime.sendMessage({
+                type: "getEmail"
+            },
+            function (response) {
+                var email = response.email;
+                console.log(response);
+                console.log(email);
+                $(email_id).val(email);
+                checkbox.checked = true;
 
-        // upon button click, send automated bug report with necessary info using emailjs
-        document.getElementById(button_id).addEventListener('click', function () {
-            console.log("clicked");
-            show(button_id, false);
-            show(email_id, false);
-            var email = document.getElementById(email_id).value;
-            var parameters = {
-                "url": tabs[0].url,
-                "time": moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
-                "location": moment.tz.guess(),
-                "identity": bug_id,
-                "email": email
-            }
-            emailjs.send("gmail", "fbcalendar_bug", parameters)
-                .then(function (response) {
-                    console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
-                    show("bug-sent", true);
-                }, function (err) {
-                    console.log("FAILED. error=", err);
-                });
-        })
+                // upon button click, send automated bug report with necessary info using email-js
+                $(button_id).click(function () {
+                    console.log("clicked");
+                    $(form_id).false();
+                    $("#sending-div").show();
+                    var parameters = {
+                        "url": tabs[0].url,
+                        "time": moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
+                        "location": moment.tz.guess(),
+                        "identity": bug_id + "-error",
+                        "email": email
+                    }
+                    emailjs.send("gmail", "fbcalendar_bug", parameters)
+                        .then(function (response) {
+                            console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
+                            $("#sending-div").hide();
+                            $("#bug-sent").show();
+                        }, function (err) {
+                            console.log("FAILED. error=", err);
+                        });
+                })
+                // upon checkbox or text click, populate/clear input field and check/uncheck checkbox
+                $(check_id).click(function (e) {
+
+//                     Check if inner object clicked was checkbox - if so, undo action
+                    e = e || event
+                    var target = e.target || e.srcElement
+                    innerId = target.id;
+                    if (innerId === checkbox_id.substring(1)) {
+                        checkbox.checked = (!checkbox.checked)
+                    }
+
+                    // Reverse state of input and checkbox
+                    console.log("click")
+                    if (checkbox.checked) {
+                        console.log("uncheck")
+                        checkbox.checked = false;
+                        $(email_id).val("");
+                    } else {
+                        console.log("check")
+                        checkbox.checked = true;
+                        $(email_id).val(email);
+                    }
+                })
+            });
     })
 }

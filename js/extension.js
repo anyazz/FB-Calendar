@@ -4,27 +4,22 @@ var tries = 0;
 var loading = true;
 var loadError = false;
 
-window.onload = extension;
+window.onload = getInfo;
+
 
 /*
  If error arises while running extension, wait and try again before changing loading to false
 */
 function error(errMsg) {
-    if (tries == 10) {
-        loading = false;
-        loadError = true;
-    } else {
-        tries += 1;
-        console.log("ERROR: ", errMsg);
-        console.log("trying extension again :", tries);
-        setTimeout(extension, 250);
-    }
+    console.log("ERROR: ", errMsg);
+    loading = false;
+    loadError = true;
 }
 
 /*
  Main extension function - retrieves info from DOM and adds to event object
 */
-function extension() {
+function getInfo() {
     $(document).ready(function () {
         try {
             // GET EVENT TITLE
@@ -69,21 +64,31 @@ function extension() {
             var textWithSpaces = getTextWithSpaces(element);
             var textWithBreaks = getTextWithBreaks(element);
 
-            // GET ADDRESS
-            var address = "";
+            // GET LOCATION
+            var location = "";
 
-            // temp1: if address is linked to map; temp2: address is plain text
-            var temp1 = textWithSpaces.match("Hide Map (.*) Report")
+            var temp1 = textWithBreaks.match("Hide Map\n(.*)\n")
             var temp2 = textWithBreaks.match("pin\n(.*)")
 
+            // location is linked to map
             if (temp1 !== null) {
-                address = temp1[1];
-            } else if (temp2 !== null) {
-                address = temp2[1]
+                location = temp1[1];
+
+                // if location consists of name and address,
+                var re = new RegExp(temp1[1] + "\n(.*)\n")
+                var nextline = textWithBreaks.match(re)
+                if (nextline != null && nextline !== "Get Directions") {
+                    location += ", " + nextline[1]
+                }
             }
 
-            if (address == "Show Map") {
-                return error();
+            // location is plain text
+            else if (temp2 !== null) {
+                location = temp2[1]
+            }
+
+            if (location == "Show Map") {
+                return error("location");
             }
 
             // GET START AND END TIMES
@@ -117,24 +122,27 @@ function extension() {
             var temp = $("[data-testid='event-permalink-details']")[0];
             if (typeof temp !== 'undefined') {
                 description = temp.innerText;
+                console.log("D1: "+ description);
             } else {
                 description = $("#event_description").text();
+                console.log("D2: "+ description);
             }
             if (description.substr(0, 14) == "No description") {
                 description = "";
+                console.log("D3: "+ description);
             }
 
             // add info to event object
             event = {
                 'summary': title,
-                'location': address,
+                'location': location,
                 'description': description,
                 'start': {
                     'dateTime': startDT,
                 },
                 'end': {
                     'dateTime': endDT,
-                },
+                }
             };
             console.log("event created", event);
             loading = false;
@@ -152,18 +160,16 @@ function extension() {
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
         switch (message.type) {
+
             // send event when popup asks
         case "getEvent":
             if (!loading && !loadError) {
                 console.log("sendResponse", event);
                 sendResponse(event);
-            }
-            else if (!loading && loadError) {
+            } else if (!loading && loadError) {
                 console.log("event null");
                 sendResponse("loading-error");
-            }
-
-            else if (loading) {
+            } else if (loading) {
                 console.log("loading");
                 sendResponse("loading");
             }
@@ -176,15 +182,26 @@ chrome.runtime.onMessage.addListener(
             loadError = false;
             tries = 0;
             console.log("tabUpdated");
-            extension();
+            getInfo();
             break;
 
             // tell popup if loading error occurred
-//        case "checkError":
-//            sendResponse(loading);
-//            break;
+            //        case "checkError":
+            //            sendResponse(loading);
+            //            break;
 
             // else, log error
+
+            // if URL replaced, re-run extension
+        case "tabReplaced":
+            sendResponse("received");
+            loading = true;
+            loadError = false;
+            tries = 0;
+            console.log("tabReplaced");
+            getInfo();
+            break;
+
         default:
             console.error("Unrecognised message: ", message);
         }
