@@ -1,8 +1,7 @@
-var SCOPES = ["https://www.googleapis.com/auth/calendar"];
-var email;
-
-// show extension and load scripts on Facebook event pages
-// adapted from http://stackoverflow.com/questions/20855956/how-to-show-chrome-extension-on-certain-domains
+/*
+ * Show extension and load scripts on Facebook event pages
+ * adapted from http://stackoverflow.com/questions/20855956/how-to-show-chrome-extension-on-certain-domains
+ */
 function onWebNav(details) {
     if (details.frameId === 0) {
         // Top-level frame
@@ -28,14 +27,18 @@ var filter = {
 chrome.webNavigation.onCommitted.addListener(onWebNav, filter);
 chrome.webNavigation.onHistoryStateUpdated.addListener(onWebNav, filter);
 
-// get Google authentication token
+/*
+ * Get Google authentication token
+ */
 chrome.identity.getAuthToken({
     'interactive': false
 }, function (token) {
     return true;
 });
 
-// when tab url changed, notify extension.js
+/*
+ * Notify extension.js on tab URL change
+ */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
         console.log("complete")
@@ -51,7 +54,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         });
     }
 });
-
 chrome.tabs.onReplaced.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
         console.log("complete")
@@ -68,12 +70,14 @@ chrome.tabs.onReplaced.addListener(function (tabId, changeInfo, tab) {
     }
 });
 
-// Get user email address for bug reports
+/*
+ * Get user email address for bug reports
+ */
+var email;
 chrome.identity.getProfileUserInfo(function (info) {
     email = info.email;
 });
-
-// On request, send user email to popup.js
+// On request, send email to popup.js
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.type == "getEmail") {
         sendResponse({

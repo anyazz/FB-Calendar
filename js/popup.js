@@ -8,41 +8,14 @@ var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;
 
 /*
- On load, check for Google authentication
-*/
+ * On load, check for Google authentication
+ */
 
 window.onload = function () {
     checkAuth();
 };
 
-// Check if url links to an event page
-function isEventUrl(url) {
-    console.log(url);
-    return true
-        //    if (!url.includes("events")) {
-        //        return false
-        //    }
-        //    var array = url.match('/events/(.*)/');
-        //    var eventID;
-        //    if (array != null) {
-        //        eventID = array[1]
-        //    }
-        //    else {
-        //        var urlArray = url.split('/')
-        //        eventID = urlArray[urlArray.length-1];
-        //    }
-        //    return (/^\d+$/.test(eventID))
-}
-
 /*
- Initiate email.js functionality (emailjs.com)
-*/
-(function () {
-    emailjs.init("user_Eng6TCgy2E3S4Q1Tz1Gcq");
-})();
-
-
-/**
  * Check if current user has authorized this application.
  * Authorization process adapted from https://developers.google.com/google-apps/calendar/quickstart/js
  */
@@ -54,10 +27,8 @@ function checkAuth() {
     }, handleAuthResult);
 }
 
-/**
+/*
  * Handle response from authorization server.
- *
- * @param {Object} authResult Authorization result.
  */
 function handleAuthResult(authResult) {
     if (authResult && !authResult.error) {
@@ -72,24 +43,19 @@ function handleAuthResult(authResult) {
     }
 }
 
-/**
+/*
  * Load Google Calendar client library.
  */
 function loadCalendarApi() {
     gapi.client.load('calendar', 'v3', loadEvent);
 }
-
-/*
-If automatic check fails, allow user to initiate auth flow by clicking button.
-*/
+// If automatic check fails, allow user to initiate auth flow by clicking button.
 $("#auth-buttons").click(function () {
     handleAuthClick(event);
 });
 
-/**
+/*
  * Iinitiate auth flow in response to user clicking authorize button.
- *
- * @param {Event} event Button click event.
  */
 function handleAuthClick(event) {
     gapi.auth.authorize({
@@ -101,7 +67,14 @@ function handleAuthClick(event) {
     return false;
 }
 
-/**
+/*
+ * Initiate email.js functionality
+ */
+(function () {
+    emailjs.init("user_Eng6TCgy2E3S4Q1Tz1Gcq");
+})();
+
+/*
  * Load event info into popup window
  */
 var calendarList = [];
@@ -112,8 +85,7 @@ function loadEvent() {
         currentWindow: true
     }, function (tabs) {
         if (isEventUrl(tabs[0].url)) {
-            console.log("valid url")
-                // load user's calendar list from Google API
+            // load user's calendar list from Google API
             var request = gapi.client.calendar.calendarList.list();
 
             request.execute(function (resp) {
@@ -134,18 +106,36 @@ function loadEvent() {
                         }
                     }
                 }
-                console.log("loadEvent", calendarList);
                 getEvent();
             });
         } else {
-            console.log("invalid url")
             $("#event-error").show();
             $("#loading-div").hide();
         }
     })
 }
 
-// Send message to extension.js to get event information from DOM
+// Check if url links to an FB event page
+function isEventUrl(url) {
+    if (!url.includes("events")) {
+        return false
+    }
+    var array = url.match('/events/(.*)/');
+    var eventID;
+    if (array != null) {
+        eventID = array[1]
+    } else {
+        var urlArray = url.split('/')
+        eventID = urlArray[urlArray.length - 1];
+    }
+    var isEvent = /^\d+$/.test(eventID);
+    console.log(isEvent);
+    return (isEvent);
+}
+
+/*
+ * Send message to extension.js to get event information from DOM
+ */
 function getEvent() {
     chrome.tabs.query({
         active: true,
@@ -154,7 +144,6 @@ function getEvent() {
         chrome.tabs.sendMessage(tabs[0].id, {
             type: "getEvent"
         }, function (event) {
-            console.log(event);
             if (event == "loading-error") {
                 report("load");
             } else if (event == "loading") {
@@ -163,7 +152,6 @@ function getEvent() {
                 try {
                     updateInfo(event);
                 } catch (err) {
-                    console.log(err)
                     report("display");
                 }
             }
@@ -172,8 +160,8 @@ function getEvent() {
 }
 
 /*
- Populate popup window fields
-*/
+ * Populate popup window fields
+ */
 function updateInfo(resource) {
 
     // format time using Moment.js
@@ -202,7 +190,6 @@ function updateInfo(resource) {
     $('#description').text(description);
 
     var calendarMenu = $('#calendarMenu')[0];
-    console.log("adding to options", calendarList.length);
     for (var i = 0; i < calendarList.length; i++) {
         var option = document.createElement("option");
         option.text = calendarList[i].summary;
@@ -211,32 +198,16 @@ function updateInfo(resource) {
 
     // update values and popup appearance
     eventSuccess = true;
-    console.log("eventSuccess", true);
     $("#loading-div").hide();
     $("#event-info").show();
     $("#buttons").show();
     $("#calendarMenu").show();
 
 
-    // Upon button click, execute addEvent function
+    // upon button click, execute addEvent function
     $("#buttons").click(function () {
         gapi.client.load('calendar', 'v3', addEvent(resource));
     })
-}
-
-
-//add event URL to resource description
-function updateDescription(resource, url) {
-    if (resource.description != "") {
-        resource.description += "\n\n";
-    }
-    var urlArray = url.match("(.*)/events/(.*)/");
-    if (urlArray !== null) {
-        url = urlArray[0]
-    }
-
-    resource.description += url;
-    return resource;
 }
 
 /*
@@ -272,16 +243,31 @@ function addEvent(resource) {
                 $("#add-btn")[0].src = "icons/success.png";
                 $("#add-btn-hover")[0].src = "icons/success.png"
             }
-            console.log(resp)
         })
     })
+}
+
+/*
+ * Append Facebook URL to event description
+ */
+function updateDescription(resource, url) {
+    if (resource.description != "") {
+        resource.description += "\n\n";
+    }
+    var urlArray = url.match("(.*)/events/(.*)/");
+    if (urlArray !== null) {
+        url = urlArray[0]
+    }
+
+    resource.description += url;
+    return resource;
 }
 
 /*
  * Report bugs
  */
 function report(bug_id) {
-    // show error divs
+    // show error div
     $("#event-info").hide();
     $("#loading-div").hide();
     $("#error-div").show();
@@ -312,36 +298,32 @@ function report(bug_id) {
             },
             function (response) {
                 var email = response.email;
-                console.log(response);
-                console.log(email);
                 $(email_id).val(email);
                 checkbox.checked = true;
 
                 // upon button click, send automated bug report with necessary info using email-js
                 $(button_id).click(function () {
-                    console.log("clicked");
-                    $(form_id).false();
-                    $("#sending-div").show();
-                    var parameters = {
-                        "url": tabs[0].url,
-                        "time": moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
-                        "location": moment.tz.guess(),
-                        "identity": bug_id + "-error",
-                        "email": email
-                    }
-                    emailjs.send("gmail", "fbcalendar_bug", parameters)
-                        .then(function (response) {
-                            console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
-                            $("#sending-div").hide();
-                            $("#bug-sent").show();
-                        }, function (err) {
-                            console.log("FAILED. error=", err);
-                        });
-                })
-                // upon checkbox or text click, populate/clear input field and check/uncheck checkbox
+                        $(form_id).false();
+                        $("#sending-div").show();
+                        var parameters = {
+                            "url": tabs[0].url,
+                            "time": moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
+                            "location": moment.tz.guess(),
+                            "identity": bug_id + "-error",
+                            "email": email
+                        }
+                        emailjs.send("gmail", "fbcalendar_bug", parameters)
+                            .then(function (response) {
+                                $("#sending-div").hide();
+                                $("#bug-sent").show();
+                            }, function (err) {
+                                // console.log("FAILED. error=", err);
+                            });
+                    })
+                    // upon checkbox or text click, populate/clear input field and check/uncheck checkbox
                 $(check_id).click(function (e) {
 
-//                     Check if inner object clicked was checkbox - if so, undo action
+                    // check if inner object clicked was checkbox - if so, undo action
                     e = e || event
                     var target = e.target || e.srcElement
                     innerId = target.id;
@@ -349,18 +331,16 @@ function report(bug_id) {
                         checkbox.checked = (!checkbox.checked)
                     }
 
-                    // Reverse state of input and checkbox
-                    console.log("click")
+                    // reverse state of input and checkbox
                     if (checkbox.checked) {
-                        console.log("uncheck")
                         checkbox.checked = false;
                         $(email_id).val("");
                     } else {
-                        console.log("check")
                         checkbox.checked = true;
                         $(email_id).val(email);
                     }
                 })
-            });
+            }
+        );
     })
 }
