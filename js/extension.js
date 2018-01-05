@@ -101,7 +101,7 @@ function getInfo() {
 
         // run error function if any errors thrown
         catch (err) {
-            error();
+            error(err);
         }
     })
 };
@@ -111,7 +111,7 @@ function getInfo() {
  * If error arises while running extension, update error values
  */
 function error(errMsg) {
-    // console.log("ERROR: ", errMsg);
+    console.log("ERROR: ", errMsg);
     loadError = true;
     loading = false;
 }
@@ -128,10 +128,8 @@ chrome.runtime.onMessage.addListener(
                 console.log("sendResponse", event);
                 sendResponse(event);
             } else if (!loading && loadError) {
-                console.log("event null");
                 sendResponse("loading-error");
             } else if (loading) {
-                console.log("loading");
                 sendResponse("loading");
             }
             break;
@@ -142,7 +140,6 @@ chrome.runtime.onMessage.addListener(
             sendResponse("received");
             loading = true;
             loadError = false;
-            console.log("tabUpdated");
             getInfo();
             break;
 
@@ -150,7 +147,6 @@ chrome.runtime.onMessage.addListener(
             sendResponse("received");
             loading = true;
             loadError = false;
-            console.log("tabReplaced");
             getInfo();
             break;
         }
