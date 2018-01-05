@@ -1,8 +1,8 @@
 // Dev Client ID
-var CLIENT_ID = '959780096527-sk8sgb89g46rff403qj80jarlofv46nr.apps.googleusercontent.com';
+//var CLIENT_ID = '959780096527-sk8sgb89g46rff403qj80jarlofv46nr.apps.googleusercontent.com';
 
 // Published Client ID
-//var CLIENT_ID = '959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com    ';
+var CLIENT_ID = '959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com';
 
 var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;
@@ -303,7 +303,7 @@ function report(bug_id) {
 
                 // upon button click, send automated bug report with necessary info using email-js
                 $(button_id).click(function () {
-                        $(form_id).false();
+                        $(form_id).hide();
                         $("#sending-div").show();
                         var parameters = {
                             "url": tabs[0].url,

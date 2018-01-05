@@ -40,21 +40,12 @@ chrome.identity.getAuthToken({
  * Notify extension.js on tab URL change
  */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (changeInfo.status == 'complete') {
-        console.log("complete")
-        chrome.tabs.query({
-            active: true,
-            currentWindow: true
-        }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                type: "tabUpdated"
-            }, function (response) {
-                console.log("message received:", response)
-            });
-        });
-    }
+    notifyChange("tabUpdated", tabId, changeInfo, tab)
 });
 chrome.tabs.onReplaced.addListener(function (tabId, changeInfo, tab) {
+    notifyChange("tabReplaced", tabId, changeInfo, tab)
+});
+function notifyChange(type, tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
         console.log("complete")
         chrome.tabs.query({
@@ -64,11 +55,9 @@ chrome.tabs.onReplaced.addListener(function (tabId, changeInfo, tab) {
             chrome.tabs.sendMessage(tabs[0].id, {
                 type: "tabReplaced"
             }, function (response) {
-                console.log("message received:", response)
             });
         });
-    }
-});
+}
 
 /*
  * Get user email address for bug reports
