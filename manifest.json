@@ -27,13 +27,14 @@
     }],
     "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
     "oauth2": {
-        "client_id": "959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com    ",
+        "client_id": "959780096527-3840ecdn47brr0lqefodnf9rt96uvqnd.apps.googleusercontent.com",
         "scopes": [
           "https://www.googleapis.com/auth/calendar", "profile"
         ]
     },
 
     "permissions": [
+    "*://*.facebook.com/*",
     "*://facebook.com/*",
     "*://calendar.google.com/*",
     "tabs",

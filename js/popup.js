@@ -2,70 +2,18 @@
 //var CLIENT_ID = '959780096527-sk8sgb89g46rff403qj80jarlofv46nr.apps.googleusercontent.com';
 
 // Published Client ID
-var CLIENT_ID = '959780096527-p2gansqfg71ns8unal00dodm1cbjieln.apps.googleusercontent.com';
+var CLIENT_ID = '959780096527-3840ecdn47brr0lqefodnf9rt96uvqnd.apps.googleusercontent.com';
 
 var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;
+var calendarList = [];
 
 /*
  * On load, check for Google authentication
  */
-
-window.onload = function () {
-    checkAuth();
+ window.onload = function() {
+    loadEvent();
 };
-
-/*
- * Check if current user has authorized this application.
- * Authorization process adapted from https://developers.google.com/google-apps/calendar/quickstart/js
- */
-function checkAuth() {
-    gapi.auth.authorize({
-        'client_id': CLIENT_ID,
-        'scope': SCOPES.join(' '),
-        'immediate': true
-    }, handleAuthResult);
-}
-
-/*
- * Handle response from authorization server.
- */
-function handleAuthResult(authResult) {
-    if (authResult && !authResult.error) {
-        // Hide auth UI, then load client library.
-        $('#authorize-div').hide()
-        loadCalendarApi();
-    } else {
-        // Show auth UI, allowing the user to initiate authorization by
-        // clicking authorize button.
-        $('#authorize-div').show();
-        $('#loading-div').hide();
-    }
-}
-
-/*
- * Load Google Calendar client library.
- */
-function loadCalendarApi() {
-    gapi.client.load('calendar', 'v3', loadEvent);
-}
-// If automatic check fails, allow user to initiate auth flow by clicking button.
-$("#auth-buttons").click(function () {
-    handleAuthClick(event);
-});
-
-/*
- * Iinitiate auth flow in response to user clicking authorize button.
- */
-function handleAuthClick(event) {
-    gapi.auth.authorize({
-            client_id: CLIENT_ID,
-            scope: SCOPES,
-            immediate: false
-        },
-        handleAuthResult);
-    return false;
-}
 
 /*
  * Initiate email.js functionality
@@ -77,7 +25,6 @@ function handleAuthClick(event) {
 /*
  * Load event info into popup window
  */
-var calendarList = [];
 
 function loadEvent() {
     chrome.tabs.query({
@@ -86,28 +33,42 @@ function loadEvent() {
     }, function (tabs) {
         if (isEventUrl(tabs[0].url)) {
             // load user's calendar list from Google API
-            var request = gapi.client.calendar.calendarList.list();
-
-            request.execute(function (resp) {
-                var calendars = resp.items;
-                for (var i = calendars.length; i-- > 0;) {
-                    var accessRole = calendars[i].accessRole;
-                    if (accessRole == "owner" || accessRole == "writer") {
-                        if (calendars[i].primary) {
-                            calendarList.unshift({
-                                "summary": calendars[i].summary + " (Primary)",
-                                "id": calendars[i].id
-                            })
-                        } else {
-                            calendarList.push({
-                                "summary": calendars[i].summary,
-                                "id": calendars[i].id
-                            });
+            chrome.identity.getAuthToken({ 'interactive': false }, function(token) {
+                const headers = new Headers({
+                  'Authorization' : 'Bearer ' + token,
+                  'Content-Type': 'application/json'
+                })
+                const queryParams = { headers };
+                fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', queryParams)
+                .then((response) => response.json()) // Transform the data into json
+                .then(function(data) {
+                    var calendars = data.items;
+                    if (calendars) {
+                        for (var i = calendars.length; i-- > 0;) {
+                            var accessRole = calendars[i].accessRole;
+                            if (accessRole == "owner" || accessRole == "writer") {
+                                if (calendars[i].primary) {
+                                    calendarList.unshift({
+                                        "summary": calendars[i].summary + " (Primary)",
+                                        "id": calendars[i].id
+                                    })
+                                } else {
+                                    calendarList.push({
+                                        "summary": calendars[i].summary,
+                                        "id": calendars[i].id
+                                    });
+                                }
+                            }
                         }
+                        console.log("CAL #", calendars.length)
+                    getEvent();
                     }
-                }
-                getEvent();
-            });
+                    else {
+                        $("#authorize-div").show();
+                        $('#loading-div').hide();
+                    }
+                });
+            })
         } else {
             $("#event-error").show();
             $("#loading-div").hide();
@@ -206,9 +167,16 @@ function updateInfo(resource) {
 
     // upon button click, execute addEvent function
     $("#buttons").click(function () {
-        gapi.client.load('calendar', 'v3', addEvent(resource));
+        addEvent(resource);
     })
 }
+// https://zapier.com/engineering/how-to-use-the-google-calendar-api/
+var makeQuerystring = params =>
+  Object.keys(params)
+    .map(key => {
+      return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+    })
+    .join("&");
 
 /*
  * Insert event into calendar
@@ -221,28 +189,37 @@ function addEvent(resource) {
     }, function (tabs) {
         var menu = $("#calendarMenu")[0];
         var calendarId = calendarList[menu.selectedIndex].id;
-
-        var request = gapi.client.calendar.events.insert({
-            'calendarId': calendarId,
-            'resource': updateDescription(resource, tabs[0].url)
-        });
-
-        // upon completion, replace add button with success
-        request.execute(function (resp) {
-            if ("error" in resp) {
-                switch (resp.code) {
-                case "403":
-                    $("#add-error").text("Permission denied to write to calendar.");
-                    break;
-                case "404":
-                    $("#add-error").text("Adding failed.");
-                    break;
+        chrome.identity.getAuthToken({ 'interactive': false }, function(token) {
+            const headers = new Headers({
+              'Authorization' : 'Bearer ' + token,
+              'Content-Type': 'application/json; charset=utf-8',
+            })
+            const queryParams = { 
+                method: 'POST',   
+                headers,  
+                body: JSON.stringify(updateDescription(resource, tabs[0].url)), 
+                key: 'AIzaSyAkpxDTtGgwKTJXGG-_szBEBCj0jIy5C0M'
+            };
+            fetch('https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events', queryParams)
+            .then((response) => response.json()) // Transform the data into json
+            .then(function(data) {
+                console.log(data)
+                if ("error" in data) {
+                    console.log(data.error.code)
+                    switch (data.error.code) {
+                    case "403":
+                        $("#add-error").text("Permission denied to write to calendar.");
+                        break;
+                    case "404":
+                        $("#add-error").text("Adding failed.");
+                        break;
+                    }
+                    $("#calendar-error").show();
+                } else {
+                    $("#add-btn")[0].src = "icons/success.png";
+                    $("#add-btn-hover")[0].src = "icons/success.png"
                 }
-                $("#calendar-error").show();
-            } else {
-                $("#add-btn")[0].src = "icons/success.png";
-                $("#add-btn-hover")[0].src = "icons/success.png"
-            }
+            })
         })
     })
 }

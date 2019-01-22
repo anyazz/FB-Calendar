@@ -13,7 +13,7 @@ function onWebNav(details) {
             console.log("jquery Loaded");
         });
         chrome.tabs.executeScript({
-            file: "extension.js"
+            file: "js/extension.js"
         }, function () {
             console.log("content loaded");
         });
@@ -31,7 +31,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(onWebNav, filter);
  * Get Google authentication token
  */
 chrome.identity.getAuthToken({
-    'interactive': false
+    'interactive': true
 }, function (token) {
     return true;
 });
@@ -47,16 +47,17 @@ chrome.tabs.onReplaced.addListener(function (tabId, changeInfo, tab) {
 });
 function notifyChange(type, tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
-        console.log("complete")
-        chrome.tabs.query({
-            active: true,
-            currentWindow: true
-        }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
+        console.log(type);
+        chrome.tabs.executeScript(tabId, {
+            file: "js/extension.js"
+        }, function () {
+            console.log("content loaded");
+        });
+        chrome.tabs.sendMessage(tabId, {
                 type: "tabReplaced"
             }, function (response) {
-            });
         });
+    }
 }
 
 /*
@@ -66,6 +67,7 @@ var email;
 chrome.identity.getProfileUserInfo(function (info) {
     email = info.email;
 });
+
 // On request, send email to popup.js
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.type == "getEmail") {

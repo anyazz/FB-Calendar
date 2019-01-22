@@ -28,9 +28,11 @@ function getInfo() {
             var textWithBreaks = getTextWithBreaks(element);
             var location = "";
 
-            var temp1 = textWithBreaks.match("Hide Map\n(.*)\n")
+            var temp1 = textWithBreaks.match("pin\n(.*)\n")
             var temp2 = textWithBreaks.match("pin\n(.*)")
-
+            console.log(textWithBreaks)
+            console.log(temp1)
+            console.log(temp2)
             // case 1: location is linked to map
             if (temp1 !== null) {
                 location = temp1[1];
@@ -44,15 +46,15 @@ function getInfo() {
             }
 
             // case 2: location is plain text
-            else if (temp2 !== null) {
-                location = temp2[1]
-            }
+            // if (temp2 !== null) {
+            //     location = temp2[1]
+            // }
 
             // ~~~~~~~~~~~~~~~ EVENT DATE/TIME ~~~~~~~~~~~~~~
             // uses MIT's indispensable Moment.js
 
             // get Facebook-defined startDate for event
-            var DT = $("[class='_publicProdFeedInfo__timeRowTitle _5xhk']").attr('content');
+            var DT = $("[class='_2ycp _5xhk']").attr('content');
             var startDT = ""
             var endDT = ""
 
@@ -97,6 +99,7 @@ function getInfo() {
                 }
             };
             loading = false;
+            console.log(event)
         }
 
         // run error function if any errors thrown
