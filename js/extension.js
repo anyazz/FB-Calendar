@@ -1,7 +1,8 @@
 // initialize variables
 var event = "";
+var gettingInfo = false;
+var getError = false;
 var loading = true;
-var loadError = false;
 
 window.onload = getInfo;
 
@@ -10,6 +11,9 @@ window.onload = getInfo;
  */
 function getInfo() {
     $(document).ready(function () {
+        loading = false;
+        console.log("loading false")
+        gettingInfo = true;
         try {
             // ~~~~~~~~~~~~~~~ EVENT TITLE ~~~~~~~~~~~~~~
 
@@ -40,7 +44,7 @@ function getInfo() {
                 // if location consists of name and address, include append second line (address) to first (name)
                 var re = new RegExp(temp1[1] + "\n(.*)\n")
                 var nextline = textWithBreaks.match(re)
-                if (nextline != null && nextline !== "Get Directions") {
+                if (nextline != null && nextline !== "Show Map") {
                     location += ", " + nextline[1]
                 }
             }
@@ -98,7 +102,7 @@ function getInfo() {
                     'dateTime': endDT,
                 }
             };
-            loading = false;
+            gettingInfo = false;
             console.log(event)
         }
 
@@ -115,8 +119,9 @@ function getInfo() {
  */
 function error(errMsg) {
     console.log("ERROR: ", errMsg);
-    loadError = true;
     loading = false;
+    getError = true;
+    gettingInfo = false;
 }
 
 /*
@@ -127,14 +132,20 @@ chrome.runtime.onMessage.addListener(
         switch (message.type) {
             // send event or error message when popup asks
         case "getEvent":
-            if (!loading && !loadError) {
-                console.log("sendResponse", event);
-                sendResponse(event);
-            } else if (!loading && loadError) {
-                sendResponse("loading-error");
-            } else if (loading) {
-                sendResponse("loading");
+            var response;
+            if (loading) {
+                response = "loading";
             }
+            else if (gettingInfo) {
+                response = "getting info";
+            }
+            else if (getError) {
+                response = "get-error";
+            } else {
+                response = event;
+            }
+            console.log(response)
+            sendResponse(response);
             break;
 
 

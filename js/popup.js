@@ -8,12 +8,8 @@ var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 var eventSuccess = false;
 var calendarList = [];
 
-/*
- * On load, check for Google authentication
- */
- window.onload = function() {
-    loadEvent();
-};
+
+ window.onload = loadEvent;
 
 /*
  * Initiate email.js functionality
@@ -105,16 +101,26 @@ function getEvent() {
         chrome.tabs.sendMessage(tabs[0].id, {
             type: "getEvent"
         }, function (event) {
-            if (event == "loading-error") {
-                report("load");
-            } else if (event == "loading") {
-                setTimeout(getEvent, 250);
-            } else {
-                try {
-                    updateInfo(event);
-                } catch (err) {
-                    report("display");
-                }
+            console.log(event)
+            switch (event) {
+                case "get-error":
+                    report("get");
+                    break;
+                case "loading":
+                case undefined:
+                    $("#loading-text").text("Loading page...")
+                    setTimeout(getEvent, 250);
+                    break;
+                case "getting info":
+                    $("#loading-text").text("Getting event info...")
+                    setTimeout(getEvent, 250);
+                    break;
+                default:
+                    try {
+                        updateInfo(event);
+                    } catch (err) {
+                        report("display");
+                    }
             }
         })
     });
@@ -203,9 +209,7 @@ function addEvent(resource) {
             fetch('https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events', queryParams)
             .then((response) => response.json()) // Transform the data into json
             .then(function(data) {
-                console.log(data)
                 if ("error" in data) {
-                    console.log(data.error.code)
                     switch (data.error.code) {
                     case "403":
                         $("#add-error").text("Permission denied to write to calendar.");
@@ -245,12 +249,12 @@ function updateDescription(resource, url) {
  */
 function report(bug_id) {
     // show error div
-    $("#event-info").hide();
+    $("#event-info").hide(); 
     $("#loading-div").hide();
     $("#error-div").show();
 
     $("#error-text").text("Error " + bug_id + "ing event details.");
-    if (bug_id == "load") {
+    if (bug_id == "get") {
         $("#error-description")[0].innerText += "If this is an event page, please refresh the page and try again. "
     }
     if (bug_id == "display") {
